@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Training" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <title>Jazz — 8-Week Plan</title>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111;
+      --surface2: #161616;
+      --border: #1e1e1e;
+      --text: #f0f0f0;
+      --muted: #555;
+      --dim: #333;
+      --orange: #E8572A;
+      --blue: #2A7BE8;
+      --green: #2AE87B;
+      --yellow: #E8C12A;
+      --purple: #C12AE8;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Georgia, serif;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* ── LAYOUT ── */
+    #app {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      padding-top: var(--safe-top);
+    }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 18px 12px;
+      flex-shrink: 0;
+    }
+    header .eyebrow { font-size: 9px; letter-spacing: 4px; color: var(--dim); text-transform: uppercase; margin-bottom: 3px; }
+    header h1 { font-size: 20px; font-weight: bold; letter-spacing: -0.5px; }
+    header .sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+    /* ── TABS ── */
+    nav {
+      display: flex;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    nav button {
+      flex: 1;
+      padding: 11px 4px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: Georgia, serif;
+      font-size: 11px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    nav button.active { color: var(--orange); border-bottom-color: var(--orange); }
+
+    /* ── SCROLL AREA ── */
+    main {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: calc(16px + var(--safe-bottom));
+    }
+
+    /* ── SECTION LABEL ── */
+    .label {
+      font-size: 9px;
+      letter-spacing: 3px;
+      color: var(--dim);
+      text-transform: uppercase;
+      padding: 16px 18px 8px;
+    }
+
+    /* ── WEEK PILLS ── */
+    .pills {
+      display: flex;
+      gap: 7px;
+      padding: 0 18px 4px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex-shrink: 0;
+    }
+    .pills::-webkit-scrollbar { display: none; }
+    .pill {
+      flex-shrink: 0;
+      padding: 7px 13px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      font-family: Georgia, serif;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .pill.active { color: #fff; }
+
+    /* ── WEEK CARD ── */
+    .week-card {
+      margin: 10px 18px 0;
+      padding: 14px 16px;
+      background: var(--surface);
+      border-radius: 10px;
+      border-left: 3px solid var(--muted);
+    }
+    .week-card .phase { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; }
+    .week-card .note { font-size: 12px; color: #666; line-height: 1.6; }
+    .week-card .intensity {
+      display: inline-block;
+      font-size: 9px; letter-spacing: 1px;
+      color: var(--dim); background: var(--surface2);
+      padding: 3px 8px; border-radius: 4px;
+      text-transform: uppercase; margin-bottom: 6px;
+    }
+
+    /* ── DAY CHIPS ── */
+    .day-chips {
+      display: flex;
+      gap: 7px;
+      padding: 0 18px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .day-chips::-webkit-scrollbar { display: none; }
+    .day-chip {
+      flex-shrink: 0;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      font-family: Georgia, serif;
+      font-size: 11px;
+      cursor: pointer;
+      text-align: center;
+      line-height: 1.5;
+      transition: all 0.15s;
+    }
+    .day-chip .day-sub { font-size: 9px; opacity: 0.6; display: block; }
+    .day-chip.active { color: #fff; }
+
+    /* ── DAY HEADER ── */
+    .day-header {
+      margin: 12px 18px 0;
+      padding: 16px;
+      border-radius: 10px 10px 0 0;
+      border: 1px solid transparent;
+      border-bottom: none;
+    }
+    .day-header .day-eyebrow { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 4px; }
+    .day-header .day-title { font-size: 15px; font-weight: bold; margin-bottom: 4px; }
+    .day-header .day-note { font-size: 11px; color: #666; line-height: 1.6; margin-bottom: 10px; }
+    .day-header .day-meta { font-size: 10px; color: var(--dim); display: flex; gap: 14px; flex-wrap: wrap; }
+
+    /* ── MOVEMENT CARDS ── */
+    .movements {
+      margin: 0 18px;
+      border-radius: 0 0 10px 10px;
+      overflow: hidden;
+      border: 1px solid transparent;
+      border-top: none;
+    }
+    .movement {
+      padding: 14px 16px;
+      border-bottom: 1px solid #161616;
+      border-left: 3px solid transparent;
+    }
+    .movement:last-child { border-bottom: none; }
+    .movement:nth-child(odd) { background: #0d0d0d; }
+    .movement:nth-child(even) { background: #0a0a0a; }
+
+    .movement-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .movement-badge {
+      font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 2px 6px; border-radius: 3px; font-family: monospace; flex-shrink: 0;
+    }
+    .movement-name { font-size: 13px; font-weight: bold; }
+
+    .stats-row { display: flex; gap: 18px; margin-bottom: 7px; }
+    .stat { }
+    .stat-label { font-size: 8px; letter-spacing: 1px; text-transform: uppercase; color: var(--dim); margin-bottom: 2px; }
+    .stat-value { font-size: 13px; }
+
+    .movement-target { font-size: 11px; color: #444; margin-bottom: 8px; }
+    .movement-prog {
+      font-size: 11px; color: var(--orange);
+      background: rgba(232,87,42,0.06);
+      padding: 5px 9px; border-radius: 4px; display: inline-block;
+    }
+
+    /* ── BASELINE ── */
+    .baseline-banner {
+      margin: 12px 18px 0;
+      padding: 13px 16px;
+      background: rgba(232,87,42,0.08);
+      border: 1px solid rgba(232,87,42,0.2);
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .baseline-banner span { font-size: 11px; letter-spacing: 1.5px; color: var(--orange); text-transform: uppercase; }
+    .baseline-content {
+      margin: 0 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+      padding: 14px 16px;
+    }
+    .baseline-intro { font-size: 11px; color: #666; line-height: 1.7; margin-bottom: 12px; }
+    .baseline-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 9px 0; border-bottom: 1px solid #181818;
+    }
+    .baseline-row:last-child { border-bottom: none; }
+    .baseline-move { font-size: 13px; font-weight: bold; }
+    .baseline-note { font-size: 10px; color: var(--dim); }
+
+    /* ── RULES / FOOTER CARDS ── */
+    .card {
+      margin: 12px 18px 0;
+      padding: 16px;
+      background: var(--surface);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .card-label { font-size: 9px; letter-spacing: 3px; color: var(--dim); text-transform: uppercase; margin-bottom: 10px; }
+    .rule-row {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 8px 0; border-bottom: 1px solid #161616; font-size: 12px; color: var(--muted);
+    }
+    .rule-row:last-child { border-bottom: none; }
+    .rule-dot { color: var(--orange); font-size: 8px; margin-top: 4px; flex-shrink: 0; }
+
+    .cardio-card {
+      margin: 12px 18px 0;
+      padding: 14px 16px;
+      background: rgba(42,123,232,0.06);
+      border: 1px solid rgba(42,123,232,0.15);
+      border-radius: 10px;
+    }
+    .cardio-label { font-size: 9px; letter-spacing: 2px; color: var(--blue); text-transform: uppercase; margin-bottom: 6px; }
+    .cardio-text { font-size: 12px; color: var(--muted); line-height: 1.7; }
+
+    /* ── PROGRESS TAB ── */
+    .progress-section { padding: 0 18px; }
+    .log-entry {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+    .log-entry-header {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .log-entry-title { font-size: 13px; font-weight: bold; }
+    .log-entry-date { font-size: 10px; color: var(--muted); }
+    .log-entry-body { padding: 12px 14px; font-size: 12px; color: var(--muted); line-height: 1.7; }
+
+    .log-form { margin-top: 12px; }
+    .log-form textarea {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: Georgia, serif;
+      font-size: 13px;
+      padding: 12px;
+      resize: none;
+      height: 100px;
+      outline: none;
+    }
+    .log-form textarea:focus { border-color: var(--orange); }
+    .log-form button {
+      margin-top: 8px;
+      width: 100%;
+      padding: 13px;
+      background: var(--orange);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: Georgia, serif;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .log-form .log-meta {
+      display: flex; gap: 8px; margin-bottom: 8px;
+    }
+    .log-form select {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: Georgia, serif;
+      font-size: 12px;
+      padding: 9px 10px;
+      outline: none;
+    }
+    .delete-btn {
+      font-size: 10px; color: #333; background: none;
+      border: none; cursor: pointer; padding: 2px 4px;
+    }
+    .empty-log { font-size: 13px; color: var(--dim); text-align: center; padding: 32px 0; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="eyebrow">BuiltSimple Hybrid · Jazz</div>
+    <h1>8-Week Hypertrophy</h1>
+    <div class="sub">Barbell · Rings · Pull-up Bar · Dip Bars · Weight Vest · Flat Bench</div>
+  </header>
+
+  <nav>
+    <button class="active" onclick="showTab('plan', this)">Plan</button>
+    <button onclick="showTab('baseline', this)">Baseline</button>
+    <button onclick="showTab('log', this)">Log</button>
+    <button onclick="showTab('rules', this)">Rules</button>
+  </nav>
+
+  <main id="main-content"></main>
+</div>
+
+<script>
+const WEEKS = [
+  { week:1, phase:"Baseline",    intensity:"Moderate",       note:"Test your maxes. Learn the movements. Leave 2 reps in reserve every set." },
+  { week:2, phase:"Baseline",    intensity:"Moderate",       note:"Repeat Week 1 structure. Focus on form. Log every set." },
+  { week:3, phase:"Build",       intensity:"Moderate-High",  note:"Add 1 set to your key lift. Push closer to failure on top sets." },
+  { week:4, phase:"Build",       intensity:"High",           note:"Increase weight 5–10% on key lifts. Rep targets stay the same." },
+  { week:5, phase:"Accumulate",  intensity:"High",           note:"Push rep targets to x4 your max. Higher density in sub-max work." },
+  { week:6, phase:"Accumulate",  intensity:"High",           note:"Top sets: push to true failure once per session. Log your PRs." },
+  { week:7, phase:"Peak",        intensity:"Very High",      note:"Rep targets at x5 your baseline max. Key lifts near max intensity." },
+  { week:8, phase:"Retest",      intensity:"Deload + Test",  note:"Drop volume 40%. Retest your 4 baseline movements. Set new targets." },
+];
+
+const PHASE_COLORS = {
+  Baseline:"#555", Build:"#E8572A", Accumulate:"#2A7BE8", Peak:"#C12AE8", Retest:"#2AE87B"
+};
+
+const DAYS = [
+  {
+    day:"Day 1", label:"Push", color:"#E8572A",
+    keyLift:"Barbell Bench Press",
+    keyNote:"4–5 sets near failure. Full range, controlled descent.",
+    movements:[
+      { name:"Barbell Bench Press",           type:"KEY",       sets:"4–5", reps:"6–10",    rest:"2–3 min", target:"x3–5 your max reps @ working weight", prog:"+5lb when top of range hit all sets" },
+      { name:"Dips (BW → Weighted Vest)",     type:"SUB-MAX",   sets:"3",   reps:"50% max", rest:"90 sec",  target:"Hit rep target across sets",           prog:"Add reps → then add vest weight" },
+      { name:"Ring Push-Ups",                 type:"SUB-MAX",   sets:"3",   reps:"50% max", rest:"90 sec",  target:"Hit rep target",                       prog:"Lower rings to increase difficulty" },
+      { name:"Barbell Overhead Press",        type:"SUB-MAX",   sets:"2",   reps:"50% max", rest:"90 sec",  target:"Hit rep target",                       prog:"+5lb when reps top out" },
+      { name:"Ring Face Pulls",               type:"ACCESSORY", sets:"3",   reps:"15–20",   rest:"60 sec",  target:"Shoulder health — never skip",         prog:"Add reps, not difficulty" },
+    ]
+  },
+  {
+    day:"Day 2", label:"Pull", color:"#2A7BE8",
+    keyLift:"Pull-Ups",
+    keyNote:"4–5 sets to near-failure. Add vest weight once BW becomes easy.",
+    movements:[
+      { name:"Pull-Ups (BW → Weighted Vest)",     type:"KEY",       sets:"4–5", reps:"Max–2",   rest:"2–3 min", target:"x3–5 your baseline max total", prog:"Add reps then add vest weight" },
+      { name:"Barbell Row (Pendlay or Bent-Over)", type:"SUB-MAX",   sets:"4",   reps:"50% max", rest:"90 sec",  target:"Hit rep target",               prog:"+5lb when reps top out" },
+      { name:"Ring Rows (feet elevated)",          type:"SUB-MAX",   sets:"3",   reps:"50% max", rest:"90 sec",  target:"Hit rep target",               prog:"Elevate feet higher for difficulty" },
+      { name:"Ring Curl (Bicep)",                  type:"SUB-MAX",   sets:"3",   reps:"50% max", rest:"60 sec",  target:"Hit rep target",               prog:"Adjust body angle for more load" },
+      { name:"Ring Face Pulls",                    type:"ACCESSORY", sets:"2",   reps:"15–20",   rest:"60 sec",  target:"Shoulder health",              prog:"Add reps" },
+    ]
+  },
+  {
+    day:"Day 3", label:"Legs", color:"#2AE87B",
+    keyLift:"Barbell Back Squat",
+    keyNote:"4–5 sets near failure. Full depth. Brace hard.",
+    movements:[
+      { name:"Barbell Back Squat",            type:"KEY",       sets:"4–5", reps:"6–10",      rest:"2–3 min", target:"x3–5 your max reps @ working weight", prog:"+5–10lb when top of range hit all sets" },
+      { name:"Barbell Romanian Deadlift",     type:"SUB-MAX",   sets:"4",   reps:"50% max",   rest:"90 sec",  target:"Hit rep target",                      prog:"+5lb when reps top out" },
+      { name:"Barbell Bulgarian Split Squat", type:"SUB-MAX",   sets:"3",   reps:"50% max/leg",rest:"90 sec", target:"Hit rep target",                      prog:"Add reps → add barbell load" },
+      { name:"Barbell Hip Thrust (on bench)", type:"SUB-MAX",   sets:"3",   reps:"50% max",   rest:"90 sec",  target:"Hit rep target",                      prog:"+10lb when reps top out" },
+      { name:"Hanging Knee Raises",           type:"ACCESSORY", sets:"3",   reps:"50% max",   rest:"60 sec",  target:"Hit rep target",                      prog:"Progress to toes-to-bar" },
+    ]
+  },
+  {
+    day:"Day 4", label:"Upper Hyp.", color:"#E8C12A",
+    keyLift:"Standing BB Overhead Press",
+    keyNote:"4–5 sets. Strict — no leg drive. Shoulder and upper chest.",
+    movements:[
+      { name:"Barbell Overhead Press",        type:"KEY",       sets:"4–5", reps:"6–10",    rest:"2–3 min", target:"x3–5 your max reps",      prog:"+5lb when top range hit all sets" },
+      { name:"Weighted Dips (Vest)",          type:"SUB-MAX",   sets:"3",   reps:"50% max", rest:"90 sec",  target:"Hit rep target",          prog:"Add vest weight progressively" },
+      { name:"Weighted Pull-Ups (Vest)",      type:"SUB-MAX",   sets:"3",   reps:"50% max", rest:"90 sec",  target:"Hit rep target",          prog:"Add vest weight progressively" },
+      { name:"Close-Grip Bench Press",        type:"SUB-MAX",   sets:"3",   reps:"50% max", rest:"90 sec",  target:"Hit rep target",          prog:"+5lb when reps top out" },
+      { name:"Barbell Curl (Strict)",         type:"SUB-MAX",   sets:"3",   reps:"50% max", rest:"60 sec",  target:"Hit rep target",          prog:"+2.5lb when reps top out" },
+    ]
+  },
+  {
+    day:"Day 5", label:"Power", color:"#C12AE8",
+    keyLift:"Conventional Deadlift",
+    keyNote:"Your heaviest day. 4–5 sets. No same-day cardio.",
+    movements:[
+      { name:"Conventional Deadlift",                    type:"KEY",       sets:"4–5", reps:"4–6",         rest:"3–4 min", target:"Max effort. Heavy.",   prog:"+5–10lb per week while form holds" },
+      { name:"Push-Ups with Weight Vest",                type:"SUB-MAX",   sets:"3",   reps:"50% max",     rest:"90 sec",  target:"Hit rep target",       prog:"Add vest weight or add reps" },
+      { name:"Ring Rows (weighted vest)",                type:"SUB-MAX",   sets:"3",   reps:"50% max",     rest:"90 sec",  target:"Hit rep target",       prog:"Elevate feet + add vest" },
+      { name:"Barbell Front Squat (or Goblet w/ plate)", type:"SUB-MAX",   sets:"3",   reps:"50% max",     rest:"90 sec",  target:"Hit rep target",       prog:"+5lb when reps top out" },
+      { name:"Ab Wheel / Hanging Toes-to-Bar",          type:"ACCESSORY", sets:"3",   reps:"Max quality", rest:"60 sec",  target:"Core stability",       prog:"Add reps each week" },
+    ]
+  },
+];
+
+const TYPE_STYLE = {
+  KEY:       { bg:"rgba(232,87,42,0.13)",   border:"#E8572A", badgeBg:"rgba(232,87,42,0.2)",   label:"KEY LIFT" },
+  "SUB-MAX": { bg:"rgba(42,123,232,0.08)",  border:"#2A7BE8", badgeBg:"rgba(42,123,232,0.2)",  label:"SUB-MAX" },
+  ACCESSORY: { bg:"rgba(42,232,123,0.06)",  border:"#2AE87B", badgeBg:"rgba(42,232,123,0.2)",  label:"ACCESSORY" },
+};
+
+let activeWeek = 0;
+let activeDay  = 0;
+let currentTab = 'plan';
+
+// ── STORAGE ──
+function getLogs() { try { return JSON.parse(localStorage.getItem('trainingLogs') || '[]'); } catch(e){ return []; } }
+function saveLogs(logs) { localStorage.setItem('trainingLogs', JSON.stringify(logs)); }
+
+// ── RENDER ──
+function render() {
+  const main = document.getElementById('main-content');
+  if (currentTab === 'plan')     main.innerHTML = renderPlan();
+  if (currentTab === 'baseline') main.innerHTML = renderBaseline();
+  if (currentTab === 'log')      main.innerHTML = renderLog();
+  if (currentTab === 'rules')    main.innerHTML = renderRules();
+}
+
+function renderPlan() {
+  const w = WEEKS[activeWeek];
+  const d = DAYS[activeDay];
+  const pc = PHASE_COLORS[w.phase];
+
+  const weekPills = WEEKS.map((wk, i) => `
+    <button class="pill ${i===activeWeek?'active':''}"
+      style="${i===activeWeek?`background:${PHASE_COLORS[wk.phase]}22;border-color:${PHASE_COLORS[wk.phase]};color:${PHASE_COLORS[wk.phase]};`:''}"
+      onclick="selectWeek(${i})">W${wk.week}</button>
+  `).join('');
+
+  const dayChips = DAYS.map((dy, i) => `
+    <button class="day-chip ${i===activeDay?'active':''}"
+      style="${i===activeDay?`background:${dy.color}18;border-color:${dy.color};color:${dy.color};`:''}"
+      onclick="selectDay(${i})">
+      ${dy.day}<span class="day-sub">${dy.label}</span>
+    </button>
+  `).join('');
+
+  const movHtml = d.movements.map((m, i) => {
+    const s = TYPE_STYLE[m.type];
+    const restColor = m.type === 'KEY' ? '#E8572A' : '#2A7BE8';
+    return `
+      <div class="movement" style="border-left-color:${s.border};background:${i%2===0?'#0d0d0d':'#0a0a0a'}">
+        <div class="movement-top">
+          <span class="movement-badge" style="color:${s.border};background:${s.badgeBg}">${s.label}</span>
+          <span class="movement-name">${m.name}</span>
+        </div>
+        <div class="stats-row">
+          <div class="stat">
+            <div class="stat-label">Sets</div>
+            <div class="stat-value">${m.sets}</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Reps</div>
+            <div class="stat-value">${m.reps}</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Rest</div>
+            <div class="stat-value" style="color:${restColor}">${m.rest}</div>
+          </div>
+        </div>
+        <div class="movement-target">Target: ${m.target}</div>
+        <div class="movement-prog">↑ ${m.prog}</div>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="label">Week</div>
+    <div class="pills">${weekPills}</div>
+
+    <div class="week-card" style="border-left-color:${pc}">
+      <div class="phase" style="color:${pc}">${w.phase} Phase</div>
+      <div class="intensity">${w.intensity}</div>
+      <div class="note">${w.note}</div>
+    </div>
+
+    <div class="label">Day</div>
+    <div class="day-chips">${dayChips}</div>
+
+    <div class="day-header" style="background:${d.color}12;border-color:${d.color}33">
+      <div class="day-eyebrow" style="color:${d.color}">${d.day} · ${d.label}</div>
+      <div class="day-title">Key: ${d.keyLift}</div>
+      <div class="day-note">${d.keyNote}</div>
+      <div class="day-meta">
+        <span>Total Sets: 10–15 max</span>
+        <span>Time: 45–60 min</span>
+      </div>
+    </div>
+    <div class="movements" style="border-color:${d.color}33">${movHtml}</div>
+
+    <div class="cardio-card">
+      <div class="cardio-label">Cardio (Separate Days)</div>
+      <div class="cardio-text">Zone 2 + HIIT on your 2 off days. Never stack cardio same day as Legs or Day 5. Zone 2 = active recovery with a newborn — use it that way.</div>
+    </div>
+    <div style="height:8px"></div>
+  `;
+}
+
+function renderBaseline() {
+  const items = [
+    { move:"Barbell Bench Press",       note:"Moderate weight, max reps" },
+    { move:"Pull-Ups",                  note:"Bodyweight, max strict reps" },
+    { move:"Barbell Romanian Deadlift", note:"Moderate weight, max reps" },
+    { move:"Hanging Knee Raises",       note:"Max strict reps" },
+  ];
+  return `
+    <div class="label">Baseline Test</div>
+    <div class="card">
+      <div class="baseline-intro">
+        Test max reps on each movement before Week 1 using a moderate weight — not an all-out 1RM. These numbers set all your rep targets for 8 weeks.<br><br>
+        <strong style="color:#f0f0f0">Rep Target Formula:</strong><br>
+        Weeks 1–4: max × 3 &nbsp;·&nbsp; Weeks 5–6: max × 4 &nbsp;·&nbsp; Week 7: max × 5
+      </div>
+      ${items.map(b => `
+        <div class="baseline-row">
+          <span class="baseline-move">${b.move}</span>
+          <span class="baseline-note">${b.note}</span>
+        </div>
+      `).join('')}
+    </div>
+    <div class="card" style="margin-top:12px">
+      <div class="card-label">Example</div>
+      <div style="font-size:12px;color:#666;line-height:1.9">
+        Pull-ups max: <strong style="color:#f0f0f0">12 reps</strong><br>
+        Week 1–4 target: <strong style="color:#E8572A">36 total reps</strong> per session<br>
+        Week 5–6 target: <strong style="color:#2A7BE8">48 total reps</strong> per session<br>
+        Week 7 target: <strong style="color:#C12AE8">60 total reps</strong> per session<br><br>
+        Accumulate however you want — small sets, EMOM, circuits. Just hit the number.
+      </div>
+    </div>
+    <div style="height:8px"></div>
+  `;
+}
+
+function renderLog() {
+  const logs = getLogs();
+  const dayOptions = DAYS.map((d,i) => `<option value="${i}">${d.day} — ${d.label}</option>`).join('');
+  const weekOptions = WEEKS.map((w,i) => `<option value="${i}">Week ${w.week} — ${w.phase}</option>`).join('');
+
+  const logEntries = logs.length === 0
+    ? `<div class="empty-log">No sessions logged yet.<br>Hit a workout and record it here.</div>`
+    : [...logs].reverse().map((l, i) => `
+        <div class="log-entry">
+          <div class="log-entry-header">
+            <span class="log-entry-title">${l.dayLabel} · W${l.week+1}</span>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="log-entry-date">${l.date}</span>
+              <button class="delete-btn" onclick="deleteLog(${logs.length-1-i})">✕</button>
+            </div>
+          </div>
+          <div class="log-entry-body">${l.notes.replace(/\n/g,'<br>')}</div>
+        </div>
+      `).join('');
+
+  return `
+    <div class="label">Log a Session</div>
+    <div style="padding:0 18px">
+      <div class="log-form">
+        <div class="log-meta">
+          <select id="log-week">${weekOptions}</select>
+          <select id="log-day">${dayOptions}</select>
+        </div>
+        <textarea id="log-notes" placeholder="What did you lift? Any PRs? How did it feel? Sleep quality?"></textarea>
+        <button onclick="saveLog()">Save Session</button>
+      </div>
+    </div>
+    <div class="label">Session History</div>
+    <div class="progress-section">${logEntries}</div>
+    <div style="height:8px"></div>
+  `;
+}
+
+function renderRules() {
+  const rules = [
+    "Don't change the structure for 4 weeks minimum",
+    "Track every set — weight, reps, how it felt",
+    "Leave 1–2 reps in reserve most sets",
+    "Avoid emotional training — stick to the plan",
+    "New father = sleep > extra sets, always",
+    "Repeat before modifying anything",
+    "Progress feels boring before it feels impressive",
+  ];
+  const choose25 = [
+    "You often burn out mid-program",
+    "Sessions creep past 60 minutes",
+    "You prefer consistent, predictable workouts",
+  ];
+  const chooseRep = [
+    "You feel stuck despite consistent training",
+    "You work hard but don't see change",
+    "You need a measurable number to chase",
+    "You want more flexibility in session format",
+  ];
+  return `
+    <div class="label">Non-Negotiables</div>
+    <div class="card">
+      ${rules.map((r,i,a) => `
+        <div class="rule-row" style="${i===a.length-1?'border-bottom:none':''}">
+          <span class="rule-dot">■</span>${r}
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="label">Which Method — Quick Guide</div>
+    <div class="card">
+      <div class="card-label" style="color:#E8572A">Choose 2-5-15 if</div>
+      ${choose25.map(r => `<div class="rule-row"><span class="rule-dot" style="color:#E8572A">■</span>${r}</div>`).join('')}
+      <div class="card-label" style="color:#2A7BE8;margin-top:14px">Choose Repetition Method if</div>
+      ${chooseRep.map(r => `<div class="rule-row"><span class="rule-dot" style="color:#2A7BE8">■</span>${r}</div>`).join('')}
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="card-label">This Plan</div>
+      <div style="font-size:12px;color:#666;line-height:1.8">
+        Uses <strong style="color:#f0f0f0">2-5-15 as the structure</strong> (volume guardrails, 10–15 sets, 45–60 min) with the <strong style="color:#f0f0f0">Repetition Method for progression tracking</strong> (baseline test → rep targets → retest at Week 8). Best of both for your schedule.
+      </div>
+    </div>
+    <div style="height:8px"></div>
+  `;
+}
+
+// ── INTERACTIONS ──
+function showTab(tab, btn) {
+  currentTab = tab;
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+function selectWeek(i) { activeWeek = i; render(); }
+function selectDay(i)  { activeDay  = i; render(); document.getElementById('main-content').scrollTop = 0; }
+
+function saveLog() {
+  const weekEl = document.getElementById('log-week');
+  const dayEl  = document.getElementById('log-day');
+  const notes  = document.getElementById('log-notes').value.trim();
+  if (!notes) return;
+  const logs = getLogs();
+  logs.push({
+    week: parseInt(weekEl.value),
+    dayLabel: DAYS[parseInt(dayEl.value)].day + ' ' + DAYS[parseInt(dayEl.value)].label,
+    notes,
+    date: new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }),
+  });
+  saveLogs(logs);
+  render();
+}
+
+function deleteLog(i) {
+  const logs = getLogs();
+  logs.splice(i, 1);
+  saveLogs(logs);
+  render();
+}
+
+// ── SERVICE WORKER ──
+if ('serviceWorker' in navigator) {
+  const sw = `
+    const CACHE = 'training-v1';
+    self.addEventListener('install', e => e.waitUntil(
+      caches.open(CACHE).then(c => c.addAll(['./', './index.html']))
+    ));
+    self.addEventListener('fetch', e => e.respondWith(
+      caches.match(e.request).then(r => r || fetch(e.request))
+    ));
+  `;
+  const blob = new Blob([sw], { type: 'application/javascript' });
+  navigator.serviceWorker.register(URL.createObjectURL(blob));
+}
+
+render();
+</script>
+</body>
+</html>
